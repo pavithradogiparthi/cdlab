@@ -1,138 +1,78 @@
 #include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
 #include<conio.h>
-char str[50],opstr[75];
-int f[2][9]={2,3,4,4,4,0,6,6,0,1,1,3,3,5,5,0,5,0};
-int col,col1,col2;
-char c;
-void swt(){
-    switch(c){
-        case'+':col=0;break;
-        case'-':col=1;break;
-        case'*':col=2;break;
-        case'/':col=3;break;
-        case'^':col=4;break;
-        case'(':col=5;break;
-        case')':col=6;break;
-        case'd':col=7;break;
-        case'$':col=8;break;
-        default:printf("\nterminal mismatch");
-                //exit(0);
-                break;
-    }
+void main()
+{
+char stack[20],ip[20],opt[10][10][1],ter[10];
+int i,j,k,n,top=0,col,row;
+clrscr();
+for(i=0;i<10;i++){stack[i]=NULL; ip[i]=NULL;
+for(j=0;j<10;j++){opt[i][j][1]=NULL;}}
+printf("Enter the no.of terminals:");
+scanf("%d",&n);
+printf("\nEnter the terminals:");
+scanf("%s",ter);
+printf("\nEnter the table values:\n");
+for(i=0;i<n;i++)
+{
+for(j=0;j<n;j++)
+{
+printf("Enter the value for %c %c:",ter[i],ter[j]);
+scanf("%s",opt[i][j]);
+}
+}
+printf("\nOPERATOR PRECEDENCE TABLE:\n");
+for(i=0;i<n;i++){printf("\t%c",ter[i]);}
+printf("\n");
+for(i=0;i<n;i++){printf("\n%c",ter[i]);
+for(j=0;j<n;j++){printf("\t%c",opt[i][j][0]);}}
+stack[top]='$';
+printf("\nEnter the input string:");
+scanf("%s",ip);
+i=0;
+printf("\nSTACK\t\t\tINPUT STRING\t\t\tACTION\n");
+printf("\n%s\t\t\t%s\t\t\t",stack,ip);
+while(i<=strlen(ip))
+{
+for(k=0;k<n;k++)
+{
+if(stack[top]==ter[k])
+col=k;
+if(ip[i]==ter[k])
+row=k;
+}
+if((stack[top]=='$')&&(ip[i]=='$')){
+printf("String is accepted");
+break;}
+else if((opt[col][row][0]=='<') ||(opt[col][row][0]=='='))
+{ stack[++top]=opt[col][row][0];
+stack[++top]=ip[i];
+ printf("Shift %c",ip[i]);
+ i++;
+  }
+else{
+ if(opt[col][row][0]=='>')
+{
+while(stack[top]!='<'){--top;}
+top=top-1;
+printf("Reduce");
+}
+else
+{
+printf("\nString is not accepted");
+break;
+}
+}
+printf("\n");
+for(k=0;k<=top;k++)
+{
+printf("%c",stack[k]);
+}
+printf("\t\t\t");
+for(k=i;k<strlen(ip);k++){
+printf("%c",ip[k]);
+}
+printf("\t\t\t");
+}
+getch();
 }
 
-void main(){
-    int i=0,j=0,col1,cn,k=0;
-    int t1=0,foundg=0;
-    char temp[20];
-    //clrscr();
-    printf("\n enter arithmetic expression:");
-    scanf("%s",str);
-    while(str[i]!='\0')
-        i++;
-    str[i]='$';
-    str[++i]='\0';
-    printf("%s\n",str);
-    come:
-    i=0;
-    opstr[0]='$';
-    swt();
-    col1=col;
-    c=str[i];
-    swt();
-    col2=col;
-    if(f[1][col1]>f[2][col2]){
-        opstr[j]='>';
-        j++;
-    }
-    else if(f[1][col1]<f[2][col2]){
-        opstr[j]='<';
-        j++;
-    }
-    else{
-        opstr[j]='=';
-        j++;
-    }
-    while(str[i]!='$'){
-        c=str[i];
-        swt();
-        col1=col;
-        c=str[++i];
-        swt();
-        col2=col;
-        opstr[j]=str[--i];
-        j++;
-        if(f[0][col1]>f[1][col2]){
-            opstr[j]='>';
-            j++;
-        }
-        else if(f[0][col1]<f[1][col2]){
-            opstr[j]='<';
-            j++;
-        }
-        else{
-            opstr[j]='=';j++;
-        }
-        i++;
-    }
-    opstr[j]='$';
-    opstr[++j]='\0';
-    printf("\nPrecedence input:%s\n",opstr);
-    i=0;
-    j=0;
-    while(opstr[i]!='\0'){
-        foundg=0;
-        while(foundg!=1){
-            if(opstr[i]=='\0')goto redone;
-            if(opstr[i]=='>')foundg=1;
-            t1=i;
-            i++;
-        }
-        if(foundg==1)
-        for(i=t1;i>0;i--)
-        if(opstr[i]=='<')break;
-        if(i==0){
-            printf("\nerror");
-            exit(1);
-        }
-        cn=i;
-        j=0;
-        i=t1+1;
-        while(opstr[i]!='\0'){
-            temp[j]=opstr[i];
-            j++;i++;
-        }
-        temp[j]='\0';
-        opstr[cn]='E';
-        opstr[++cn]='\0';
-        strcat(opstr,str);
-        printf("\n%s",opstr);
-        i=1;
-    }
-    redone:k=0;
-    while(opstr[k]!='\0'){
-        k++;
-        if(opstr[k]=='<'){
-            printf("\nerror");
-            exit(1);
-        }
-    }
-    if((opstr[0]=='$')&&(opstr[2]=='$'))goto sue;
-    i=1;
-    while(opstr[i]!='\0'){
-        c=opstr[i];
-        if(c=='+'||c=='/'||c=='*'||c=='$'){
-            temp[j]=c;
-            j++;
-        }
-        i++;
-    }
-    temp[j]='\0';
-    strcpy(str,temp);
-    goto come;
-    sue:
-    printf("\n success");
-    //return 0;
-}
